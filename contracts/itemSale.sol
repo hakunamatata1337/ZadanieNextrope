@@ -43,11 +43,12 @@ contract itemSale {
         valueEth = _valueEth;
         valueERC = _valueERC;
     }
-
+    //function for purchasing item for ETH
     function purchaseProductETH() external payable onlyBuyer() onlyPurchasingStage(){
         require(msg.value == valueEth, "too little wei transferred");
         saleStatus = SaleStatus.boughtByETH;
     } 
+    //function for purchasing product for ERC
     //Before invoking this function u need to approve this smart contract to spend your ERC 20
     function purchaseProductERC() external  onlyBuyer() onlyPurchasingStage(){
         bool success= token.transferFrom(msg.sender,address(this), valueERC);
@@ -69,7 +70,7 @@ contract itemSale {
         require(msg.sender == arbitrator, "This function can only be called by arbitrator");
         if(isSellerRight) {
             if(saleStatus == SaleStatus.boughtByETH){
-                seller.transfer(address(this).balance);
+                seller.transfer(valueEth);
             }
             else {
                 token.transfer(seller, valueERC);
@@ -77,7 +78,7 @@ contract itemSale {
             
         }else {
              if(saleStatus == SaleStatus.boughtByETH){
-                buyer.transfer(address(this).balance);
+                buyer.transfer(valueEth);
             }
             else {
                 token.transfer(buyer, valueERC);
