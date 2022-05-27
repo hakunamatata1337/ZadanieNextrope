@@ -5,6 +5,7 @@
   },
   "devDependencies": {
     "@openzeppelin/test-helpers": "^0.5.15",
-    "chai": "^4.3.6"
+    "chai": "^4.3.6",
+    "solidity-coverage": "^0.7.21"
   }
 }

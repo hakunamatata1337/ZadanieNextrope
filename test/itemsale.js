@@ -93,10 +93,10 @@ contract("Testing purchaseProductERC", async ()=> {
     })
 })
 
-contract("resolveDispute when seller is right", async ()=> {
+contract("ETH resolveDispute when seller is right", async ()=> {
     it('resolve dispute', async ()=>{
         await itemSaleContract.purchaseProductETH({from:buyer, value:valueEth});
-        //buyer does not to want confirm that he received item so arbitrator needs to resolve Dispute
+        
 
         //buyer tries to call resolveDispute function 
         await expectRevert(itemSaleContract.resolveDispute(false,{from:buyer}),'This function can only be called by arbitrator');
@@ -104,7 +104,36 @@ contract("resolveDispute when seller is right", async ()=> {
     })
 })
 
-contract("resolveDispute when buyer is right", async ()=> {
+contract("ERC resolveDispute when seller is right", async ()=> {
+    it('resolve dispute', async ()=>{
+        await polskiZlotyContract.approve(itemSaleContract.address,valueERC,{from:buyer});
+        await itemSaleContract.purchaseProductERC({from:buyer});
+        let balanceOfSellerBefore = await polskiZlotyContract.balanceOf(seller);
+        balanceOfSellerBefore = balanceOfSellerBefore.toNumber();
+        //buyer does not to want confirm that he received item so arbitrator needs to resolve Dispute
+        
+        //buyer tries to call resolveDispute function 
+        await expectRevert(itemSaleContract.resolveDispute(false,{from:buyer}),'This function can only be called by arbitrator');
+        await itemSaleContract.resolveDispute(true,{from:arbitrator});
+
+        let balanceAfter = await polskiZlotyContract.balanceOf(seller);
+        assert.equal(balanceAfter, balanceOfSellerBefore+10, "ERC20 not transferred correctly");
+    })
+})
+
+contract("ETH resolveDispute when buyer is right", async ()=> {
+    it('resolve dispute', async ()=>{
+        await itemSaleContract.purchaseProductETH({from:buyer, value:valueEth});
+        //seller refuses to ship the item
+
+        //seller tries to call resolveDispute function 
+        await expectRevert(itemSaleContract.resolveDispute(true,{from:seller}),'This function can only be called by arbitrator');
+        await itemSaleContract.resolveDispute(false,{from:arbitrator});
+    })
+})
+
+
+contract("ERC resolveDispute when buyer is right", async ()=> {
     it('resolve dispute', async ()=>{
         await polskiZlotyContract.approve(itemSaleContract.address,valueERC,{from:buyer});
         await itemSaleContract.purchaseProductERC({from:buyer});
